@@ -387,7 +387,7 @@ fn create_text_record(index: usize, text: &[u8]) -> (Vec<u8>, Vec<u8>, usize) {
 ///
 /// # Examples
 /// ```no_run
-/// use iepub::prelude::MobiWriter;
+/// use zepub::prelude::MobiWriter;
 /// let fs = std::fs::OpenOptions::new()
 /// .write(true)
 /// .truncate(true)
@@ -466,7 +466,7 @@ impl<T: Write + Seek> MobiWriter<T> {
     ///
     /// # Examples
     /// ```no_run
-    /// use iepub::prelude::MobiWriter;
+    /// use zepub::prelude::MobiWriter;
     /// let fs = std::fs::OpenOptions::new()
     /// .write(true)
     /// .truncate(true)
