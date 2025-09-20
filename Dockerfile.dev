@@ -1,4 +1,4 @@
 FROM inkbox/rust:1.85.0
-WORKDIR /iepub
-COPY . /iepub
+WORKDIR /crate-zepub
+COPY . /crate-zepub
 RUN apt install -y bsdmainutils unzip 
