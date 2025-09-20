@@ -1,6 +1,7 @@
 use super::common;
 use crate::{common::get_media_type, prelude::*};
 use quick_xml::events::Event;
+use quick_xml::escape::escape;
 use std::collections::HashMap;
 
 /// 生成html
@@ -33,12 +34,13 @@ pub(crate) fn to_html(chap: &mut EpubHtml, append_title: bool) -> String {
         // 正文
     }
     let title = chap.title();
+    let escaped_title = escape(title);
     format!(
         r#"<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" epub:prefix="z3998: http://www.daisy.org/z3998/2012/vocab/structure/#" lang="zh" xml:lang="zh">
   <head>
-    <title>{title}</title>
+    <title>{escaped_title}</title>
 {css}
 </head>
   <body>
@@ -47,7 +49,7 @@ pub(crate) fn to_html(chap: &mut EpubHtml, append_title: bool) -> String {
   </body>
 </html>"#,
         if append_title {
-            format!(r#"<h1 style="text-align: center">{}</h1>"#, title)
+            format!(r#"<h1 style="text-align: center">{}</h1>"#, escaped_title)
         } else {
             String::new()
         }
@@ -58,13 +60,14 @@ fn to_nav_xml(nav: std::slice::Iter<EpubNav>) -> String {
     let mut xml = String::new();
     xml.push_str("<ul>");
     for ele in nav {
+        let escaped_title = escape(ele.title());
         if ele.child().len() == 0 {
             // 没有下一级
             xml.push_str(
                 format!(
                     "<li><a href=\"{}\">{}</a></li>",
                     ele.file_name(),
-                    ele.title()
+                    escaped_title
                 )
                 .as_str(),
             );
@@ -73,7 +76,7 @@ fn to_nav_xml(nav: std::slice::Iter<EpubNav>) -> String {
                 format!(
                     "<li><a href=\"{}\">{}</a>{}</li>",
                     ele.child().as_slice()[0].file_name(),
-                    ele.title(),
+                    escaped_title,
                     to_nav_xml(ele.child()).as_str()
                 )
                 .as_str(),
@@ -86,8 +89,9 @@ fn to_nav_xml(nav: std::slice::Iter<EpubNav>) -> String {
 
 /// 生成自定义的导航html
 pub(crate) fn to_nav_html(book_title: &str, nav: std::slice::Iter<EpubNav>) -> String {
+    let escaped_title = escape(book_title);
     format!(
-        r#"<?xml version='1.0' encoding='utf-8'?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="zh" xml:lang="zh"><head><title>{book_title}</title></head><body><nav epub:type="toc" id="id" role="doc-toc"><h2>{book_title}</h2>{}</nav></body></html>"#,
+        r#"<?xml version='1.0' encoding='utf-8'?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="zh" xml:lang="zh"><head><title>{escaped_title}</title></head><body><nav epub:type="toc" id="id" role="doc-toc"><h2>{escaped_title}</h2>{}</nav></body></html>"#,
         to_nav_xml(nav)
     )
 }
@@ -95,12 +99,13 @@ pub(crate) fn to_nav_html(book_title: &str, nav: std::slice::Iter<EpubNav>) -> S
 fn to_toc_xml_point(nav: std::slice::Iter<EpubNav>, parent: usize) -> String {
     let mut xml = String::new();
     for (index, ele) in nav.enumerate() {
+        let escaped_title = escape(ele.title());
         xml.push_str(format!("<navPoint id=\"{}-{}\">", parent, index).as_str());
         if ele.child().len() == 0 {
             xml.push_str(
                 format!(
                     "<navLabel><text>{}</text></navLabel><content src=\"{}\"></content>",
-                    ele.title(),
+                    escaped_title,
                     ele.file_name()
                 )
                 .as_str(),
@@ -109,7 +114,7 @@ fn to_toc_xml_point(nav: std::slice::Iter<EpubNav>, parent: usize) -> String {
             xml.push_str(
                 format!(
                     "<navLabel><text>{}</text></navLabel><content src=\"{}\"></content>{}",
-                    ele.title(),
+                    escaped_title,
                     ele.child().as_slice()[0].file_name(),
                     to_toc_xml_point(ele.child(), index).as_str()
                 )
@@ -123,8 +128,9 @@ fn to_toc_xml_point(nav: std::slice::Iter<EpubNav>, parent: usize) -> String {
 
 /// 生成epub中的toc.ncx文件
 pub(crate) fn to_toc_xml(book_title: &str, nav: std::slice::Iter<EpubNav>) -> String {
+    let escaped_title = escape(book_title);
     format!(
-        r#"<?xml version='1.0' encoding='utf-8'?><ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1"><head><meta content="1394" name="dtb:uid"/><meta content="0" name="dtb:depth"/><meta content="0" name="dtb:totalPageCount"/><meta content="0" name="dtb:maxPageNumber"/></head><docTitle><text>{book_title}</text></docTitle><navMap>{}</navMap></ncx>"#,
+        r#"<?xml version='1.0' encoding='utf-8'?><ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1"><head><meta content="1394" name="dtb:uid"/><meta content="0" name="dtb:depth"/><meta content="0" name="dtb:totalPageCount"/><meta content="0" name="dtb:maxPageNumber"/></head><docTitle><text>{escaped_title}</text></docTitle><navMap>{}</navMap></ncx>"#,
         to_toc_xml_point(nav, 0)
     )
 }
