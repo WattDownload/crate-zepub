@@ -1,4 +1,4 @@
-# iepub
+# zepub
 
 [EPUB](https://www.w3.org/TR/2023/REC-epub-33-20230525/)、[MOBI](https://wiki.mobileread.com/wiki/MOBI)读写库，
 
