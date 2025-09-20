@@ -73,7 +73,7 @@ jobs:
         id: v
         run: |
           echo NEXT_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' Cargo.toml) >> $GITHUB_OUTPUT
-          echo PREV_VERSION=$(cargo search iepub --limit 1 | sed -nE 's/^[^"]*"//; s/".*//1p' -) >> $GITHUB_OUTPUT
+          echo PREV_VERSION=$(cargo search zepub --limit 1 | sed -nE 's/^[^"]*"//; s/".*//1p' -) >> $GITHUB_OUTPUT
   release:
     runs-on: ubuntu-24.04
     needs: [check]
@@ -126,7 +126,7 @@ jobs:
           FILES=$(git --no-pager show --pretty="" --name-only HEAD)
           echo $FILES
           git --no-pager show --pretty="" --name-only HEAD | grep CHANGELOG.md || (echo "::error ::NO CHANGELOG UPDATE,FAIL TO RELEASE" && exit 101)
-          gh release create -F CHANGELOG.md --target master v${{ needs.check.outputs.NEXT_VERSION }} ./out/iepub-tool
+          gh release create -F CHANGELOG.md --target master v${{ needs.check.outputs.NEXT_VERSION }} ./out/zepub-tool
   publish:
     runs-on: ubuntu-24.04
     needs: [check,release]
@@ -137,10 +137,10 @@ jobs:
       # 必须 每个crates依次 package后publish，因为后续的package的时候要求前面的必须在crates.io，所以不能一次性把所有crate都packages后再publish
       matrix:
         package:
-          - crate: iepub-derive
+          - crate: zepub-derive
             path: derive
             args: -vv
-          - crate: iepub
+          - crate: zepub
             path: lib
             args: --no-verify -vv
     steps:
@@ -172,3 +172,4 @@ jobs:
           echo "Cargo Publishing..."
           cargo publish ${{ matrix.package.args }}
           echo "New version $NEXT_VERSION has been published"
+
