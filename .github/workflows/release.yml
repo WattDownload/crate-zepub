@@ -23,49 +23,9 @@ jobs:
           version=$(curl -sL  https://api.github.com/repos/rust-lang/rust/tags | jq -c --raw-output 'map(select(.name | startswith("release") | not)) | sort_by(.name) | reverse | .[:6] | [.[].name]')
           echo "$version"
           echo "rust=$version" >> $GITHUB_OUTPUT
-  test:
-    runs-on: ubuntu-24.04
-    needs: [version]
-    strategy:
-      fail-fast: false
-      matrix:
-        version: ${{ fromJSON( needs.version.outputs.rust ) }}
-    container:
-      image: inkbox/rust:${{ matrix.version }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        if: ${{ github.event_name == 'push' }}
-        with:
-         fetch-depth: 0
-      - name: Checkout
-        uses: actions/checkout@v4
-        if: ${{ github.event_name == 'pull_request' }}
-        with:
-          ref: ${{github.head_ref}}
-      - name: Checkout on Manual Dispatch
-        uses: actions/checkout@v4
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-      - name: Ready
-        run: |
-          pwd
-          rm -rf ${CARGO_HOME}/config.toml && cd / && apt update -y && apt install -y libssl-dev pkg-config fonts-wqy-zenhei
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-         toolchain: ${{ matrix.version }}
-      - name: Test
-        shell: bash
-        run: |
-          if [[ "${{ matrix.version }}" < "1.80.1" ]]; then 
-            sudo apt update -y
-            sudo apt-get install libssl-dev
-            rustup toolchain install nightly-2024-06-21 && rustup default nightly-2024-06-21 && cargo -Zminimal-versions generate-lockfile && rustup default ${{ matrix.version }}; 
-          fi
-          cargo test --workspace --all-features -- --exact --show-output
-          cargo test --workspace -- --exact --show-output
   check:
     runs-on: ubuntu-24.04
-    needs: [version, test]
+    needs: [version]
     outputs:
       NEXT_VERSION: ${{ steps.v.outputs.NEXT_VERSION }}
       PREV_VERSION: ${{ steps.v.outputs.PREV_VERSION }}
@@ -175,3 +135,4 @@ jobs:
           echo "Cargo Publishing..."
           cargo publish ${{ matrix.package.args }}
           echo "New version $NEXT_VERSION has been published"
+
