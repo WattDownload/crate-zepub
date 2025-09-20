@@ -1,6 +1,6 @@
 #[allow(unused)]
 #[allow(dead_code)]
-extern crate iepub_derive;
+extern crate zepub_derive;
 mod adapter;
 mod common;
 mod cover;
