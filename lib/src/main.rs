@@ -9,7 +9,7 @@ use std::{env, fs::File};
 
 use cli::arg::{Arg, ArgOption, OptionDef, OptionType};
 use commands::{epub, mobi};
-use iepub::prelude::*;
+use zepub::prelude::*;
 
 /// 支持的全局参数
 fn create_option_def() -> Vec<OptionDef> {
@@ -87,8 +87,8 @@ pub(crate) enum Book<'a> {
 /// [return] 0 epub 1 mobi,None 没有指定文件参数
 fn check_input_type(arg: &Arg) -> Option<(usize, String)> {
     let check_method: Vec<fn(&mut File) -> IResult<bool>> = vec![
-        iepub::prelude::check::is_epub,
-        iepub::prelude::check::is_mobi,
+        zepub::prelude::check::is_epub,
+        zepub::prelude::check::is_mobi,
     ];
 
     if let Some(opt) = arg.find_opt("i") {
@@ -187,7 +187,7 @@ fn main() {
         }
     } else if res == 1 {
         // mobi
-        match iepub::prelude::MobiReader::new(std::fs::File::open(path).unwrap_or_else(|s| {
+        match zepub::prelude::MobiReader::new(std::fs::File::open(path).unwrap_or_else(|s| {
             exec_err!("err: {}", s);
         }))
         .and_then(|mut f| f.load())
