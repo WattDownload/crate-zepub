@@ -80,7 +80,7 @@ jobs:
   release:
     runs-on: ubuntu-24.04
     needs: [check]
-    if: github.event_name == 'push'
+    if: success() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     permissions:
       contents: write
       packages: write
@@ -133,7 +133,7 @@ jobs:
   publish:
     runs-on: ubuntu-24.04
     needs: [check,release]
-    if: github.event_name == 'push' && needs.check.outputs.NEXT_VERSION != needs.check.outputs.PREV_VERSION
+    if: success() && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && needs.check.outputs.NEXT_VERSION != needs.check.outputs.PREV_VERSION
     strategy:
       fail-fast: false
       max-parallel: 1
@@ -175,5 +175,3 @@ jobs:
           echo "Cargo Publishing..."
           cargo publish ${{ matrix.package.args }}
           echo "New version $NEXT_VERSION has been published"
-
-
