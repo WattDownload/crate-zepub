@@ -11,7 +11,7 @@ use super::{
 ///
 /// # Examples
 /// ```rust
-/// use iepub::prelude::*;
+/// use zepub::prelude::*;
 ///
 /// fn main() ->IResult<()>{
 ///     let v = MobiBuilder::default()
