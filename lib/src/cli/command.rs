@@ -4,7 +4,7 @@ use crate::{
     cli::arg::{self},
     exec_err, msg,
 };
-use iepub::prelude::*;
+use zepub::prelude::*;
 
 // 是否覆盖文件
 fn is_overiade(global_opts: &[arg::ArgOption], opts: &[arg::ArgOption]) -> bool {
@@ -88,17 +88,17 @@ fn read_book(file: &str) -> IResult<OwnBook> {
     msg!("reading file {}", file);
     if std::fs::File::open(file)
         .map_err(|_| false)
-        .and_then(|mut f| iepub::prelude::check::is_epub(&mut f).map_err(|_| false))
+        .and_then(|mut f| zepub::prelude::check::is_epub(&mut f).map_err(|_| false))
         .unwrap_or(false)
     {
         read_from_file(file).map(|f| OwnBook::EPUB(f))
     } else if std::fs::File::open(file)
         .map_err(|_| false)
-        .and_then(|mut f| iepub::prelude::check::is_mobi(&mut f).map_err(|_| false))
+        .and_then(|mut f| zepub::prelude::check::is_mobi(&mut f).map_err(|_| false))
         .unwrap_or(false)
     {
         let f = std::fs::File::open(file)?;
-        iepub::prelude::MobiReader::new(f)
+        zepub::prelude::MobiReader::new(f)
             .and_then(|mut f| f.load())
             .map(|f| OwnBook::MOBI(f))
     } else {
@@ -112,16 +112,16 @@ pub(crate) mod epub {
     use crate::cli::command::write_file;
     use crate::exec_err;
     use crate::Book;
-    use iepub::prelude::adapter::add_into_epub;
-    use iepub::prelude::adapter::epub_to_mobi;
-    use iepub::prelude::appender::write_metadata;
-    use iepub::prelude::read_from_file;
-    use iepub::prelude::EpubBook;
-    use iepub::prelude::EpubBuilder;
-    use iepub::prelude::EpubNav;
-    use iepub::prelude::IResult;
-    use iepub::prelude::MobiBook;
-    use iepub::prelude::MobiWriter;
+    use zepub::prelude::adapter::add_into_epub;
+    use zepub::prelude::adapter::epub_to_mobi;
+    use zepub::prelude::appender::write_metadata;
+    use zepub::prelude::read_from_file;
+    use zepub::prelude::EpubBook;
+    use zepub::prelude::EpubBuilder;
+    use zepub::prelude::EpubNav;
+    use zepub::prelude::IResult;
+    use zepub::prelude::MobiBook;
+    use zepub::prelude::MobiWriter;
 
     use crate::{
         cli::arg::{self, ArgOption, CommandOptionDef, OptionDef, OptionType},
@@ -797,7 +797,7 @@ pub(crate) mod epub {
 
 pub(crate) mod mobi {
 
-    use iepub::prelude::{adapter::mobi_to_epub, EpubWriter, MobiNav};
+    use zepub::prelude::{adapter::mobi_to_epub, EpubWriter, MobiNav};
 
     use crate::{
         cli::arg::{self, ArgOption, OptionDef, OptionType},
