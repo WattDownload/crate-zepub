@@ -1,5 +1,5 @@
 [package]
-name = "iepub-derive"
+name = "zepub-derive"
 version = { workspace=true }
 edition = "2021"
 license = { workspace = true }
