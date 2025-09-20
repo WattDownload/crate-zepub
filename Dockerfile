@@ -10,20 +10,20 @@ RUN cargo build --release -vv --target=$(arch)-unknown-linux-musl --all-features
 VOLUME /root/.cargo/git
 VOLUME /root/.cargo/registry
 COPY . /workdir/app
-RUN rm -rf target/$(arch)-unknown-linux-musl/release/deps/iepub-* \
-    && rm -rf target/$(arch)-unknown-linux-musl/release/deps/libiepub* \
+RUN rm -rf target/$(arch)-unknown-linux-musl/release/deps/zepub-* \
+    && rm -rf target/$(arch)-unknown-linux-musl/release/deps/libzepub* \
     && rm -rf target/$(arch)-unknown-linux-musl/release/deps/tool-* \
     && rm -rf target/$(arch)-unknown-linux-musl/release/deps/derive-* \
     && rm -rf target/$(arch)-unknown-linux-musl/release/deps/libderive* \
-    && rm -rf target/release/deps/libiepub* \
-    && rm -rf target/release/deps/iepub-* \
+    && rm -rf target/release/deps/libzepub* \
+    && rm -rf target/release/deps/zepub-* \
     && rm -rf target/release/deps/tool-* \
     && rm -rf target/release/deps/derive-* \
     && rm -rf target/release/deps/libderive*
-RUN cargo build --release --target=$(arch)-unknown-linux-musl && cp target/$(arch)-unknown-linux-musl/release/iepub ./iepub-tool && chmod +x ./iepub-tool
+RUN cargo build --release --target=$(arch)-unknown-linux-musl && cp target/$(arch)-unknown-linux-musl/release/zepub ./zepub-tool && chmod +x ./zepub-tool
 
 
 
 FROM scratch
-COPY --from=0 /workdir/app/iepub-tool /iepub-tool
-CMD ["/iepub-tool"]
+COPY --from=0 /workdir/app/zepub-tool /zepub-tool
+CMD ["/zepub-tool"]
