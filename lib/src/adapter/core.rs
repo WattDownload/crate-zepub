@@ -42,8 +42,8 @@ fn get_mobi_assets_file_name(a: &MobiAssets) -> String {
 ///
 /// # Examples
 /// ```no_run
-/// use iepub::prelude::*;
-/// use iepub::prelude::adapter::mobi_to_epub;
+/// use zepub::prelude::*;
+/// use zepub::prelude::adapter::mobi_to_epub;
 ///
 /// let mut book = std::fs::File::open(std::path::PathBuf::from("example.mobi"))
 /// .map_err(|e| IError::Io(e))
@@ -265,9 +265,9 @@ pub fn generate_text_img_xml<T: Fn(Vec<u8>) -> Vec<u8>>(html: &[u8], callback: T
 ///
 /// # Examples
 /// ```no_run
-/// use iepub::prelude::*;
-/// use iepub::prelude::adapter::epub_to_mobi;
-/// use iepub::prelude::read_from_file;
+/// use zepub::prelude::*;
+/// use zepub::prelude::adapter::epub_to_mobi;
+/// use zepub::prelude::read_from_file;
 ///
 /// let mut epub = read_from_file("example.epub").unwrap();
 /// let mut mobi = epub_to_mobi(&mut epub).unwrap();
