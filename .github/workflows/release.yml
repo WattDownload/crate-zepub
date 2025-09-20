@@ -43,6 +43,9 @@ jobs:
         if: ${{ github.event_name == 'pull_request' }}
         with:
           ref: ${{github.head_ref}}
+      - name: Checkout on Manual Dispatch
+        uses: actions/checkout@v4
+        if: ${{ github.event_name == 'workflow_dispatch' }}
       - name: Ready
         run: |
           pwd
@@ -172,4 +175,5 @@ jobs:
           echo "Cargo Publishing..."
           cargo publish ${{ matrix.package.args }}
           echo "New version $NEXT_VERSION has been published"
+
 
