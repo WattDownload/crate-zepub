@@ -10,6 +10,7 @@ on:
       - '*.md'
     branches:
       - master
+      - fix/inconsistent-character-encoding
 jobs:
   version:
     runs-on: ubuntu-24.04
@@ -135,4 +136,5 @@ jobs:
           echo "Cargo Publishing..."
           cargo publish ${{ matrix.package.args }}
           echo "New version $NEXT_VERSION has been published"
+
 
