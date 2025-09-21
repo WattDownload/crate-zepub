@@ -187,9 +187,10 @@ fn write_metadata(
     // .create_element("dc:lang")
     // .write_text_content(BytesText::new(book.info.title.as_str()));
     if let Some(creator) = book.creator() {
+        let raw_creator = unescape(creator).unwrap_or_else(|_| creator.into());
         xml.create_element("dc:creator")
             .with_attribute(("id", "creator"))
-            .write_text_content(BytesText::new(creator))?;
+            .write_text_content(BytesText::new(&raw_creator))?;
     }
 
     if let Some(desc) = book.description() {
@@ -215,19 +216,22 @@ fn write_metadata(
             .write_text_content(BytesText::new(v))?;
     }
     if let Some(v) = book.publisher() {
+        let raw_publisher = unescape(v).unwrap_or_else(|_| v.into());
         xml.create_element("dc:publisher")
             .with_attribute(("id", "publisher"))
-            .write_text_content(BytesText::new(v))?;
+            .write_text_content(BytesText::new(&raw_publisher))?;
     }
     if let Some(v) = book.subject() {
+        let raw_subject = unescape(v).unwrap_or_else(|_| v.into());
         xml.create_element("dc:subject")
             .with_attribute(("id", "subject"))
-            .write_text_content(BytesText::new(v))?;
+            .write_text_content(BytesText::new(&raw_subject))?;
     }
     if let Some(v) = book.contributor() {
+        let raw_contributor = unescape(v).unwrap_or_else(|_| v.into());
         xml.create_element("dc:contributor")
             .with_attribute(("id", "contributor"))
-            .write_text_content(BytesText::new(v))?;
+            .write_text_content(BytesText::new(&raw_contributor))?;
     }
 
     // 自定义的meta
