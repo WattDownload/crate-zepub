@@ -8,7 +8,7 @@ use std::collections::HashMap;
 /// This handles cases where the input string may or may not already be escaped.
 fn normalize_and_escape(s: &str) -> String {
     let unescaped_s = unescape(s).unwrap_or_else(|_| s.into());
-    escape(&unescaped_s).to_string()
+    escape(&*unescaped_s).to_string()
 }
 
 /// 生成html
