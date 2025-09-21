@@ -10,7 +10,6 @@ on:
       - '*.md'
     branches:
       - master
-      - fix/inconsistent-character-encoding
 jobs:
   version:
     runs-on: ubuntu-24.04
@@ -89,8 +88,7 @@ jobs:
         run: |
           FILES=$(git --no-pager show --pretty="" --name-only HEAD)
           echo $FILES
-          git --no-pager show --pretty="" --name-only HEAD | grep CHANGELOG.md || (echo "::error ::NO CHANGELOG UPDATE,FAIL TO RELEASE" && exit 101)
-          gh release create -F CHANGELOG.md --target master v${{ needs.check.outputs.NEXT_VERSION }} ./out/zepub-tool
+          gh release create -F CHANGELOG.md --target master v${{ needs.check.outputs.NEXT_VERSION }} ./out/iepub-tool
   publish:
     runs-on: ubuntu-24.04
     needs: [check,release]
@@ -136,5 +134,6 @@ jobs:
           echo "Cargo Publishing..."
           cargo publish ${{ matrix.package.args }}
           echo "New version $NEXT_VERSION has been published"
+
 
 
