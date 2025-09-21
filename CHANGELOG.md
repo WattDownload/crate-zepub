@@ -1,1 +1,1 @@
-- V 1.1.3: Fix inconsistent character escaping || Publish
+- V 1.1.4: Allow both escaped and unescaped title, description
