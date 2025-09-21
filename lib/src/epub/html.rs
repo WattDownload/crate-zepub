@@ -1,8 +1,15 @@
 use super::common;
 use crate::{common::get_media_type, prelude::*};
 use quick_xml::events::Event;
-use quick_xml::escape::escape;
+use quick_xml::escape::{escape, unescape};
 use std::collections::HashMap;
+
+/// Normalizes a string by unescaping it, then escapes it for safe XML/HTML output.
+/// This handles cases where the input string may or may not already be escaped.
+fn normalize_and_escape(s: &str) -> String {
+    let unescaped_s = unescape(s).unwrap_or_else(|_| s.into());
+    escape(&unescaped_s).to_string()
+}
 
 /// 生成html
 pub(crate) fn to_html(chap: &mut EpubHtml, append_title: bool) -> String {
@@ -34,7 +41,7 @@ pub(crate) fn to_html(chap: &mut EpubHtml, append_title: bool) -> String {
         // 正文
     }
     let title = chap.title();
-    let escaped_title = escape(title);
+    let escaped_title = normalize_and_escape(title);
     format!(
         r#"<?xml version='1.0' encoding='utf-8'?>
 <!DOCTYPE html>
@@ -60,7 +67,7 @@ fn to_nav_xml(nav: std::slice::Iter<EpubNav>) -> String {
     let mut xml = String::new();
     xml.push_str("<ul>");
     for ele in nav {
-        let escaped_title = escape(ele.title());
+        let escaped_title = normalize_and_escape(ele.title());
         if ele.child().len() == 0 {
             // 没有下一级
             xml.push_str(
@@ -89,7 +96,7 @@ fn to_nav_xml(nav: std::slice::Iter<EpubNav>) -> String {
 
 /// 生成自定义的导航html
 pub(crate) fn to_nav_html(book_title: &str, nav: std::slice::Iter<EpubNav>) -> String {
-    let escaped_title = escape(book_title);
+    let escaped_title = normalize_and_escape(book_title);
     format!(
         r#"<?xml version='1.0' encoding='utf-8'?><!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="zh" xml:lang="zh"><head><title>{escaped_title}</title></head><body><nav epub:type="toc" id="id" role="doc-toc"><h2>{escaped_title}</h2>{}</nav></body></html>"#,
         to_nav_xml(nav)
@@ -99,7 +106,7 @@ pub(crate) fn to_nav_html(book_title: &str, nav: std::slice::Iter<EpubNav>) -> S
 fn to_toc_xml_point(nav: std::slice::Iter<EpubNav>, parent: usize) -> String {
     let mut xml = String::new();
     for (index, ele) in nav.enumerate() {
-        let escaped_title = escape(ele.title());
+        let escaped_title = normalize_and_escape(ele.title());
         xml.push_str(format!("<navPoint id=\"{}-{}\">", parent, index).as_str());
         if ele.child().len() == 0 {
             xml.push_str(
@@ -128,7 +135,7 @@ fn to_toc_xml_point(nav: std::slice::Iter<EpubNav>, parent: usize) -> String {
 
 /// 生成epub中的toc.ncx文件
 pub(crate) fn to_toc_xml(book_title: &str, nav: std::slice::Iter<EpubNav>) -> String {
-    let escaped_title = escape(book_title);
+    let escaped_title = normalize_and_escape(book_title);
     format!(
         r#"<?xml version='1.0' encoding='utf-8'?><ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1"><head><meta content="1394" name="dtb:uid"/><meta content="0" name="dtb:depth"/><meta content="0" name="dtb:totalPageCount"/><meta content="0" name="dtb:maxPageNumber"/></head><docTitle><text>{escaped_title}</text></docTitle><navMap>{}</navMap></ncx>"#,
         to_toc_xml_point(nav, 0)
@@ -172,8 +179,10 @@ fn write_metadata(
     xml.create_element("dc:identifier")
         .with_attribute(("id", "id"))
         .write_text_content(BytesText::new(book.identifier()))?;
+
+    let raw_title = unescape(book.title()).unwrap_or_else(|_| book.title().into());
     xml.create_element("dc:title")
-        .write_text_content(BytesText::new(book.title()))?;
+        .write_text_content(BytesText::new(&raw_title))?;
     // xml
     // .create_element("dc:lang")
     // .write_text_content(BytesText::new(book.info.title.as_str()));
@@ -182,14 +191,17 @@ fn write_metadata(
             .with_attribute(("id", "creator"))
             .write_text_content(BytesText::new(creator))?;
     }
+
     if let Some(desc) = book.description() {
+        let raw_desc = unescape(desc).unwrap_or_else(|_| desc.into());
         xml.create_element("dc:description")
-            .write_text_content(BytesText::new(desc))?;
+            .write_text_content(BytesText::new(&raw_desc))?;
 
         xml.create_element("meta")
             .with_attribute(("property", "desc"))
-            .write_text_content(BytesText::new(desc))?;
+            .write_text_content(BytesText::new(&raw_desc))?;
     }
+    
     if book.cover().is_some() {
         xml.create_element("meta")
             .with_attribute(("name", "cover"))
