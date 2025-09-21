@@ -1,1 +1,1 @@
-- V 1.1.4: Allow both escaped and unescaped title, description
+- V 1.1.4: Allow both escaped and unescaped title, description, chapter titles
