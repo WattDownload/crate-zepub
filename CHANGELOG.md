@@ -1,1 +1,1 @@
-- V 1.1.3: Fix inconsistent character escaping
+- V 1.1.3: Fix inconsistent character escaping || Publish
