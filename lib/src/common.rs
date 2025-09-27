@@ -239,6 +239,8 @@ impl DateTimeFormater {
         Self::custom_start(timestamp, 1970)
     }
 
+    // This implementation will ONLY be used for NATIVE targets (Windows, Linux, etc.)
+    #[cfg(not(target_arch = "wasm32"))]
     pub fn default() -> Self {
         Self::new(
             std::time::SystemTime::now()
@@ -246,6 +248,14 @@ impl DateTimeFormater {
                 .map(|v| v.as_secs())
                 .unwrap_or(0),
         )
+    }
+
+    // This new implementation will ONLY be used for the WASM target
+    #[cfg(target_arch = "wasm32")]
+    pub fn default() -> Self {
+        // Call JavaScript's `Date.now()` which returns milliseconds, then convert to seconds
+        let timestamp_secs = (js_sys::Date::now() / 1000.0) as u64;
+        Self::new(timestamp_secs)
     }
 
     pub fn with_timezone_offset(mut self, offset: i16) -> Self {
