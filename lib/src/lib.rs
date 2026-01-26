@@ -1,7 +1,7 @@
 #[allow(unused)]
 #[allow(dead_code)]
 #[allow(clippy::needless_range_loop)]
-extern crate iepub_derive;
+extern crate zepub_derive;
 mod adapter;
 mod common;
 mod cover;
