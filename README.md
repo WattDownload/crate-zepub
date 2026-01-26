@@ -1,9 +1,9 @@
-# iepub
+# zepub
 
 [EPUB](https://www.w3.org/TR/2023/REC-epub-33-20230525/)、[MOBI](https://wiki.mobileread.com/wiki/MOBI)读写库，
 
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/inkroom/iepub/release.yml?label=CI)
-[![Crates.io version](https://img.shields.io/crates/v/iepub.svg)](https://crates.io/crates/iepub)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/inkroom/zepub/release.yml?label=CI)
+[![Crates.io version](https://img.shields.io/crates/v/zepub.svg)](https://crates.io/crates/zepub)
 
 ## EPUB
 
@@ -15,9 +15,9 @@
 - （推荐）使用`EpubBuilder`快速生成
 
 ```rust
-use iepub::prelude::EpubHtml;
-use iepub::prelude::EpubBuilder;
-use iepub::prelude::Direction;
+use zepub::prelude::EpubHtml;
+use zepub::prelude::EpubBuilder;
+use zepub::prelude::Direction;
 
 EpubBuilder::default()
     .with_title("书名")
@@ -51,7 +51,7 @@ EpubBuilder::default()
 ### 读取
 
 ```rust
-use iepub::prelude::{reader::read_from_vec, reader::read_from_file, EpubHtml};
+use zepub::prelude::{reader::read_from_vec, reader::read_from_file, EpubHtml};
 let mut data = Vec::new();// epub的二进制数据
 
 let mut book = read_from_vec(data);
@@ -62,7 +62,7 @@ let mut bbook = read_from_file("epub格式文件绝对路径");
 
 ### 注意事项
 
-- `iepub`使用`EpubHtml`来存储章节内容，但是`EpubHtml#data`实际只会存储 html>body 节点内的内容，其他比如样式表将会存放在其他属性中
+- `zepub`使用`EpubHtml`来存储章节内容，但是`EpubHtml#data`实际只会存储 html>body 节点内的内容，其他比如样式表将会存放在其他属性中
 - 不同的阅读器对于文件名的兼容性不同，这里建议文件最好使用`.xhtml`后缀，例如`EpubHtml::default().with_file_name("1.xhtml")`
 
 
@@ -82,7 +82,7 @@ let mut bbook = read_from_file("epub格式文件绝对路径");
 ### 读取
 
 ```rust
-use iepub::prelude::*;
+use zepub::prelude::*;
 
 let path = std::env::current_dir().unwrap().join("1.mobi");
 let mut mobi = MobiReader::new(std::fs::File::open(path.to_str().unwrap()).unwrap()).unwrap();
@@ -136,7 +136,7 @@ let v = MobiBuilder::default()
 ### mobi -> epub
 
 ```rust
-use iepub::prelude::*;
+use zepub::prelude::*;
 let mut book = std::fs::File::open(std::path::PathBuf::from("example.mobi"))
             .map_err(|e| IError::Io(e))
             .and_then(|f| MobiReader::new(f))
@@ -150,7 +150,7 @@ epub.write("convert.epub").unwrap();
 ### epub -> mobi
 
 ```rust
-use iepub::prelude::*;
+use zepub::prelude::*;
 let mut epub = EpubBook::default();
 
 let mobi = epub_to_mobi(&mut epub).unwrap();
@@ -164,7 +164,7 @@ MobiWriter::new(&mut v)
 
 ## 命令行工具
 
-[lib/src/cli](https://github.com/inkroom/iepub/releases)目录为命令行工具，支持mobi和epub格式，但是不同格式支持的命令不尽相同
+[lib/src/cli](https://github.com/inkroom/zepub/releases)目录为命令行工具，支持mobi和epub格式，但是不同格式支持的命令不尽相同
 
 目前支持
 - 获取元数据，如标题、作者
@@ -180,7 +180,7 @@ MobiWriter::new(&mut v)
 
 可通过`-h`获取使用方法说明
 
-可以使用`cargo install iepub`安装
+可以使用`cargo install zepub`安装
 
 ## 缓存
 
