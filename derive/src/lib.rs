@@ -8,7 +8,7 @@ use proc_macro::TokenStream;
 ///
 ///
 /// ```compile_fail
-/// use iepub_derive::option_string_method;
+/// use zepub_derive::option_string_method;
 /// // 访问成员 self.info.k
 /// option_string_method!(info,k);
 /// // 访问成员 self.k
