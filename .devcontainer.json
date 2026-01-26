@@ -1,5 +1,5 @@
 {
-	"name": "iepub",
+	"name": "zepub",
 	"build": {
 		"dockerfile": "Dockerfile.dev"
 	},
