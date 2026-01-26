@@ -4,7 +4,7 @@ use crate::{
     cli::arg::{self, OptUtil},
     exec_err, msg,
 };
-use iepub::prelude::*;
+use zepub::prelude::*;
 
 // 是否覆盖文件
 fn is_overiade(global_opts: &[arg::ArgOption], opts: &[arg::ArgOption]) -> bool {
@@ -102,17 +102,17 @@ fn read_book(file: &str) -> IResult<OwnBook> {
     msg!("reading file {}", file);
     if std::fs::File::open(file)
         .map_err(|_| false)
-        .and_then(|mut f| iepub::prelude::check::is_epub(&mut f).map_err(|_| false))
+        .and_then(|mut f| zepub::prelude::check::is_epub(&mut f).map_err(|_| false))
         .unwrap_or(false)
     {
         read_from_file(file).map(OwnBook::EPUB)
     } else if std::fs::File::open(file)
         .map_err(|_| false)
-        .and_then(|mut f| iepub::prelude::check::is_mobi(&mut f).map_err(|_| false))
+        .and_then(|mut f| zepub::prelude::check::is_mobi(&mut f).map_err(|_| false))
         .unwrap_or(false)
     {
         let f = std::fs::File::open(file)?;
-        iepub::prelude::MobiReader::new(f)
+        zepub::prelude::MobiReader::new(f)
             .and_then(|mut f| f.load())
             .map(OwnBook::MOBI)
     } else {
@@ -131,16 +131,16 @@ pub(crate) mod epub {
     use crate::cli::command::write_file;
     use crate::exec_err;
     use crate::Book;
-    use iepub::prelude::adapter::add_into_epub;
-    use iepub::prelude::adapter::epub_to_mobi;
-    use iepub::prelude::adapter::mobi_to_epub;
-    use iepub::prelude::appender::write_metadata;
-    use iepub::prelude::EpubWriter;
+    use zepub::prelude::adapter::add_into_epub;
+    use zepub::prelude::adapter::epub_to_mobi;
+    use zepub::prelude::adapter::mobi_to_epub;
+    use zepub::prelude::appender::write_metadata;
+    use zepub::prelude::EpubWriter;
 
-    use iepub::prelude::EpubBuilder;
-    use iepub::prelude::EpubNav;
+    use zepub::prelude::EpubBuilder;
+    use zepub::prelude::EpubNav;
 
-    use iepub::prelude::MobiWriter;
+    use zepub::prelude::MobiWriter;
 
     use crate::{
         cli::arg::{self, ArgOption, CommandOptionDef, OptionDef, OptionType},
@@ -1017,7 +1017,7 @@ pub(crate) mod epub {
                     need_replace.iter().map(|f| f.0.to_string()).collect();
 
                 for ele in book.chapters_mut() {
-                    let current = iepub::path::Path::system(ele.file_name()).pop();
+                    let current = zepub::path::Path::system(ele.file_name()).pop();
                     let file_name = ele.file_name().to_string();
                     if let Some(data) = ele.data_mut() {
                         let v = |v| {
@@ -1037,7 +1037,7 @@ pub(crate) mod epub {
                                 format!(r#""{path}""#).as_bytes().to_vec()
                             }
                         };
-                        use iepub::internal::generate_text_img_xml;
+                        use zepub::internal::generate_text_img_xml;
 
                         let html = generate_text_img_xml(data, "img", "src", v);
                         let html = generate_text_img_xml(html.as_slice(), "image", "xlink:href", v);
@@ -1072,9 +1072,9 @@ pub(crate) mod epub {
                         .data_mut()
                         .and_then(|f| String::from_utf8(f.to_vec()).ok())
                     {
-                        let current = iepub::path::Path::system(ele.file_name()).pop();
+                        let current = zepub::path::Path::system(ele.file_name()).pop();
 
-                        let url = iepub::internal::get_css_content_url(data.as_str());
+                        let url = zepub::internal::get_css_content_url(data.as_str());
                         let mut n_data = data.clone();
                         for u in url {
                             let r = current.join(u).to_str();
@@ -1114,7 +1114,7 @@ pub(crate) mod epub {
 
 pub(crate) mod mobi {
 
-    use iepub::prelude::{adapter::mobi_to_epub, EpubWriter, MobiNav, MobiWriter};
+    use zepub::prelude::{adapter::mobi_to_epub, EpubWriter, MobiNav, MobiWriter};
 
     use crate::{
         cli::{
