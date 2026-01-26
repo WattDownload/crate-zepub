@@ -1302,7 +1302,7 @@ html
     fn test_read_meta_xml() {
         let xml = r##"<meta property="dcterms:modified">2025-10-18T06:23:37Z</meta>
         <dc:date id="date">2024-03-14</dc:date>
-        <meta name="generator" content="iepub-1.2.0"/>
+        <meta name="generator" content="zepub-1.2.0"/>
         <dc:identifier id="id">isbn</dc:identifier>
         <dc:title>Test Story `~!@#$%^&amp;*()_+ and []\{}| and ;&apos;:&quot; and ,./&lt;&gt;?</dc:title>
         <dc:creator id="creator">Test Creator `~!@#$%^&amp;*()_+ and []\{}| and ;&apos;:&quot; and ,./&lt;&gt;?</dc:creator>
