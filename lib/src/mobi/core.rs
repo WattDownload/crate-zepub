@@ -190,13 +190,13 @@ pub struct MobiBook {
 }
 }
 impl MobiBook {
-    iepub_derive::option_string_method!(info, creator);
-    iepub_derive::option_string_method!(info, description);
-    iepub_derive::option_string_method!(info, contributor);
-    iepub_derive::option_string_method!(info, date);
-    iepub_derive::option_string_method!(info, format);
-    iepub_derive::option_string_method!(info, publisher);
-    iepub_derive::option_string_method!(info, subject);
+    zepub_derive::option_string_method!(info, creator);
+    zepub_derive::option_string_method!(info, description);
+    zepub_derive::option_string_method!(info, contributor);
+    zepub_derive::option_string_method!(info, date);
+    zepub_derive::option_string_method!(info, format);
+    zepub_derive::option_string_method!(info, publisher);
+    zepub_derive::option_string_method!(info, subject);
     // /
     // / 设置epub最后修改时间
     // /
@@ -207,8 +207,8 @@ impl MobiBook {
     // / epub.set_last_modify("2024-06-28T08:07:07UTC");
     // / ```
     // /
-    iepub_derive::option_string_method!(last_modify);
-    iepub_derive::option_string_method!(generator);
+    zepub_derive::option_string_method!(last_modify);
+    zepub_derive::option_string_method!(generator);
 
     pub fn set_title<T: AsRef<str>>(&mut self, title: T) {
         self.info.title.clear();
