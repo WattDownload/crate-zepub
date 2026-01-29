@@ -1,15 +1,6 @@
 name: release
 on:
   workflow_dispatch:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    paths-ignore:
-      - '*.md'
-  push:
-    paths-ignore:
-      - '*.md'
-    branches:
-      - master
 jobs:
   version:
     runs-on: ubuntu-24.04
@@ -37,10 +28,13 @@ jobs:
         run: |
           echo NEXT_VERSION=$(sed -nE 's/^\s*version = "(.*?)"/\1/p' Cargo.toml) >> $GITHUB_OUTPUT
           echo PREV_VERSION=$(cargo search zepub --limit 1 | sed -nE 's/^[^"]*"//; s/".*//1p' -) >> $GITHUB_OUTPUT
+      - name: Debug Versions
+        run: |
+          echo "Local Version (Next): ${{ steps.v.outputs.NEXT_VERSION }}"
+          echo "Remote Version (Prev): ${{ steps.v.outputs.PREV_VERSION }}"
   release:
     runs-on: ubuntu-24.04
     needs: [check]
-    if: github.event_name == 'push'
     permissions:
       contents: write
       packages: write
@@ -95,7 +89,7 @@ jobs:
   publish:
     runs-on: ubuntu-24.04
     needs: [check,release]
-    if: github.event_name == 'push' && needs.check.outputs.NEXT_VERSION != needs.check.outputs.PREV_VERSION
+    if: needs.check.outputs.NEXT_VERSION != needs.check.outputs.PREV_VERSION
     strategy:
       fail-fast: false
       max-parallel: 1
@@ -137,6 +131,3 @@ jobs:
           echo "Cargo Publishing..."
           cargo publish ${{ matrix.package.args }}
           echo "New version $NEXT_VERSION has been published"
-
-
-
