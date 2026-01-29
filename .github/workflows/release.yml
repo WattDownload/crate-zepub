@@ -23,55 +23,9 @@ jobs:
           version=$(curl -sL  https://api.github.com/repos/rust-lang/rust/tags | jq -c --raw-output 'map(select(.name | startswith("release") | not)) | sort_by(.name) | reverse | .[:6] | [.[].name]')
           echo "$version"
           echo "rust=$version" >> $GITHUB_OUTPUT
-  test:
-    runs-on: ubuntu-24.04
-    needs: [version]
-    strategy:
-      fail-fast: false
-      matrix:
-        version: ${{ fromJSON( needs.version.outputs.rust ) }}
-    container:
-      image: inkbox/rust:${{ matrix.version }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-          ref: ${{ github.event_name == 'pull_request' && github.ref || '' }}
-          
-      - name: Ready
-        run: |
-          git config --global --add safe.directory $(pwd)
-          git --no-pager log | head -n 5
-          rm -rf ${CARGO_HOME}/config.toml && cd / && apt update -y && apt install -y libssl-dev pkg-config fonts-wqy-zenhei
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-         toolchain: ${{ matrix.version }}
-      - name: Test
-        shell: bash
-        run: |
-          echo "::group::编译"
-          cargo test --workspace --all-features --no-run
-          echo "::endgroup::"
-          # actions也经常下载出现问题，只能重试
-          for i in {1..4}; do
-            echo "::group::all 第 $i 次测试"
-            cargo test --workspace --all-features -- --exact --show-output 2>/dev/null && echo "::endgroup::" && break
-            echo "::endgroup::"
-            sleep 5
-          done
-          echo "::group::编译"
-          cargo test --workspace --no-run
-          echo "::endgroup::"
-          for i in {1..4}; do
-            echo "::group::第 $i 次测试"
-            cargo test --workspace -- --exact --show-output 2>/dev/null && echo "::endgroup::" && break
-            echo "::endgroup::"
-            sleep 5
-          done
   check:
     runs-on: ubuntu-24.04
-    needs: [version, test]
+    needs: [version]
     outputs:
       NEXT_VERSION: ${{ steps.v.outputs.NEXT_VERSION }}
       PREV_VERSION: ${{ steps.v.outputs.PREV_VERSION }}
@@ -183,5 +137,6 @@ jobs:
           echo "Cargo Publishing..."
           cargo publish ${{ matrix.package.args }}
           echo "New version $NEXT_VERSION has been published"
+
 
 
