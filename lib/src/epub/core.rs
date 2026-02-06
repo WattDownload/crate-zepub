@@ -62,9 +62,9 @@ macro_rules! epub_base_field{
                 $(#[$meta])*
                 pub struct $struct_name{
 
-                    id:String,
-                    _file_name:String,
-                    media_type:String,
+                    pub(crate) id:String,
+                    pub(crate) _file_name:String,
+                    pub(crate) media_type:String,
                     _data: Option<Vec<u8>>,
                     #[cfg(not(feature="cache"))]
                     reader:Option<std::sync::Arc<std::sync::Mutex< Box<dyn EpubReaderTrait+Send+Sync>>>>,
@@ -703,13 +703,13 @@ impl Drop for EpubBook {
 }
 
 impl EpubBook {
-    zepub_derive::option_string_method!(info, creator);
-    zepub_derive::option_string_method!(info, description);
-    zepub_derive::option_string_method!(info, contributor);
-    zepub_derive::option_string_method!(info, date);
-    zepub_derive::option_string_method!(info, format);
-    zepub_derive::option_string_method!(info, publisher);
-    zepub_derive::option_string_method!(info, subject);
+    iepub_derive::option_string_method!(info, creator);
+    iepub_derive::option_string_method!(info, description);
+    iepub_derive::option_string_method!(info, contributor);
+    iepub_derive::option_string_method!(info, date);
+    iepub_derive::option_string_method!(info, format);
+    iepub_derive::option_string_method!(info, publisher);
+    iepub_derive::option_string_method!(info, subject);
     // /
     // / 设置epub最后修改时间
     // /
@@ -720,9 +720,9 @@ impl EpubBook {
     // / epub.set_last_modify("2024-06-28T08:07:07UTC");
     // / ```
     // /
-    zepub_derive::option_string_method!(last_modify);
-    zepub_derive::option_string_method!(generator);
-    zepub_derive::option_string_method!(language);
+    iepub_derive::option_string_method!(last_modify);
+    iepub_derive::option_string_method!(generator);
+    iepub_derive::option_string_method!(language);
 }
 
 // 元数据
@@ -770,7 +770,7 @@ impl EpubBook {
     /// # Examples
     ///
     /// ```
-    /// use zepub::prelude::*;
+    /// use iepub::prelude::*;
     /// let mut epub = EpubBook::default();
     /// epub.add_meta(EpubMetaData::default().with_attr("k", "v").with_text("text"));
     /// ```
@@ -913,7 +913,10 @@ impl EpubBook {
         self.nav.iter()
     }
 
-    pub fn set_cover(&mut self, cover: EpubAssets) {
+    pub fn set_cover(&mut self, mut cover: EpubAssets) {
+        if let Some(r) = &self.reader {
+            cover.reader = Some(Arc::clone(r));
+        }
         self.cover = Some(cover);
     }
 
