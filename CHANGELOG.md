@@ -1,3 +1,3 @@
 ## lib
-- fix: AsRef ambiguity & release
+- Equivalent to `iepub`:`v1.3.1` (Fixes type ambiguity + more)
   
